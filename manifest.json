@@ -1,0 +1,10 @@
+{
+  "name": "FiberIQ Fibre Fault Locator",
+  "short_name": "FiberIQ",
+  "description": "Fibre fault diagnosis and localization system for network operations and field technician support.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f4f8fb",
+  "theme_color": "#0b5ed7",
+  "orientation": "portrait"
+}
