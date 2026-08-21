@@ -61,7 +61,7 @@
     "label": "FiberIQ Network Operations Dashboard"
   },
   {
-    "src": "/FiberIQ/screenshots/locator-wide.png",
+    "src": "/FiberIQ/screenshots/fault-locator-wide.png",
     "sizes": "1920x1080",
     "type": "image/png",
     "form_factor": "wide",
