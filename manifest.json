@@ -54,14 +54,14 @@
 
 "screenshots": [
   {
-    "src": "/FiberIQ/screenshots/dashboard-wide.png",
+    "src": "/FiberIQ/screenshots/dashboard.png",
     "sizes": "1920x1080",
     "type": "image/png",
     "form_factor": "wide",
     "label": "FiberIQ Network Operations Dashboard"
   },
   {
-    "src": "/FiberIQ/screenshots/locator-wide.png",
+    "src": "/FiberIQ/screenshots/locator.png",
     "sizes": "1263x506",
     "type": "image/png",
     "form_factor": "wide",
