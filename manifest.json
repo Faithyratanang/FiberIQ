@@ -54,13 +54,13 @@
 
 "screenshots": [
   {
-    "src": "/FiberIQ/screenshots/dashboard.png",
+    "src": "/FiberIQ/screenshots/dashboard.PNG",
     "type": "image/png",
     "form_factor": "wide",
     "label": "FiberIQ Network Operations Dashboard"
   },
   {
-    "src": "/FiberIQ/screenshots/fault-locator.png",
+    "src": "/FiberIQ/screenshots/fault-locator.PNG",
     "type": "image/png",
     "form_factor": "wide",
     "label": "FiberIQ Fibre Fault Localization"
