@@ -50,5 +50,20 @@
       "description": "Open the network operations dashboard.",
       "url": "/FiberIQ/#dashboard"
     }
+  ],
+
+  "screenshots": [
+    {
+      "src": "/FiberIQ/screenshots/dashboard.png",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "FiberIQ Network Operations Dashboard"
+    },
+    {
+      "src": "/FiberIQ/screenshots/fault-locator.png",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "FiberIQ Fibre Fault Localization"
+    }
   ]
 }
