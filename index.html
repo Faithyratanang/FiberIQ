@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="manifest" href="/FiberIQ/manifest.json">
+
+<meta name="theme-color" content="#0b5ed7">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="FiberIQ">
+
+<link rel="icon" type="image/png" sizes="192x192" href="/FiberIQ/icon-192.png">
+<link rel="apple-touch-icon" href="/FiberIQ/icon-192.png">
     <link rel="manifest" href="manifest.json">
 
 <meta name="theme-color" content="#0b5ed7">
@@ -5936,6 +5946,19 @@ if ("serviceWorker" in navigator) {
 
     });
 
+}
+</script>
+    <script>
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/FiberIQ/sw.js")
+            .then(registration => {
+                console.log("FiberIQ Service Worker registered:", registration.scope);
+            })
+            .catch(error => {
+                console.error("FiberIQ Service Worker registration failed:", error);
+            });
+    });
 }
 </script>
 </body>
