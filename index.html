@@ -1,0 +1,5906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>FiberIQ | Fibre Fault Locator</title>
+
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+<style>
+
+/* =========================================================
+   FIBERIQ
+   FIBRE FAULT DIAGNOSIS & LOCALIZATION SYSTEM
+   NOC ENVIRONMENT
+========================================================= */
+
+:root{
+
+    --navy:#071a2b;
+    --navy2:#0b2438;
+    --navy3:#102f48;
+
+    --blue:#0879d9;
+    --blue2:#12a8ff;
+    --cyan:#16c7e8;
+
+    --green:#18b77a;
+    --green2:#35d89a;
+
+    --yellow:#f3b629;
+    --orange:#f08332;
+    --red:#e84c5b;
+
+    --white:#ffffff;
+    --text:#173047;
+    --muted:#647b8e;
+
+    --background:#edf4f8;
+    --card:#ffffff;
+    --border:#d8e5ed;
+
+    --shadow:
+        0 8px 25px rgba(15,52,78,.08);
+
+    --shadowLarge:
+        0 18px 45px rgba(15,52,78,.12);
+}
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+
+    font-family:
+        Inter,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    background:
+        linear-gradient(
+            180deg,
+            #edf5f9 0%,
+            #f7fafc 100%
+        );
+
+    color:var(--text);
+
+    min-height:100vh;
+}
+
+
+/* =========================================================
+   TOP NOC BAR
+========================================================= */
+
+.topbar{
+
+    height:72px;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--navy),
+            #0b2a43
+        );
+
+    color:white;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:
+        0 4%;
+
+    position:sticky;
+
+    top:0;
+
+    z-index:3000;
+
+    box-shadow:
+        0 3px 15px
+        rgba(0,0,0,.15);
+}
+
+.brand{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+}
+
+.logo{
+
+    width:43px;
+
+    height:43px;
+
+    border-radius:10px;
+
+    display:grid;
+
+    place-items:center;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--cyan),
+            var(--blue2)
+        );
+
+    color:white;
+
+    font-size:20px;
+
+    font-weight:900;
+
+    box-shadow:
+        0 0 20px
+        rgba(22,199,232,.3);
+}
+
+.brandName{
+
+    font-size:20px;
+
+    font-weight:900;
+
+    letter-spacing:-.4px;
+}
+
+.brandSub{
+
+    color:#9eb8ca;
+
+    font-size:8px;
+
+    letter-spacing:1.4px;
+
+    margin-top:3px;
+}
+
+.systemStatus{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+}
+
+.onlineBadge{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:7px;
+
+    padding:
+        7px 11px;
+
+    border-radius:20px;
+
+    background:
+        rgba(24,183,122,.12);
+
+    border:
+        1px solid
+        rgba(53,216,154,.3);
+
+    color:#7ff0c0;
+
+    font-size:9px;
+
+    font-weight:800;
+}
+
+.onlineDot{
+
+    width:7px;
+
+    height:7px;
+
+    border-radius:50%;
+
+    background:var(--green2);
+
+    box-shadow:
+        0 0 10px
+        var(--green2);
+}
+
+.clock{
+
+    color:#a5bac8;
+
+    font-size:9px;
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.navbar{
+
+    background:white;
+
+    border-bottom:
+        1px solid var(--border);
+
+    padding:
+        0 4%;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:5px;
+
+    min-height:47px;
+
+    position:sticky;
+
+    top:72px;
+
+    z-index:2500;
+
+    box-shadow:
+        0 2px 10px
+        rgba(15,52,78,.04);
+}
+
+.navItem{
+
+    padding:
+        15px 14px;
+
+    color:var(--muted);
+
+    font-size:9px;
+
+    font-weight:800;
+
+    letter-spacing:.4px;
+
+    border-bottom:
+        3px solid
+        transparent;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.navItem:hover{
+
+    color:var(--blue);
+
+    background:#f4f9fc;
+}
+
+.navItem.active{
+
+    color:var(--blue);
+
+    border-bottom-color:
+        var(--blue);
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+main{
+
+    width:
+        min(
+            1400px,
+            94%
+        );
+
+    margin:auto;
+
+    padding:
+        25px 0 60px;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+.pageHeader{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:flex-end;
+
+    gap:20px;
+
+    margin-bottom:20px;
+}
+
+.pageHeader h1{
+
+    font-size:
+        clamp(
+            25px,
+            4vw,
+            38px
+        );
+
+    letter-spacing:-1.5px;
+
+    color:var(--navy);
+}
+
+.pageHeader p{
+
+    margin-top:7px;
+
+    color:var(--muted);
+
+    font-size:11px;
+
+    line-height:1.6;
+}
+
+.pageTag{
+
+    padding:
+        9px 13px;
+
+    border-radius:8px;
+
+    background:#e8f6ff;
+
+    border:
+        1px solid #c4e7f9;
+
+    color:#0879b5;
+
+    font-size:8px;
+
+    font-weight:900;
+
+    letter-spacing:.8px;
+}
+
+
+/* =========================================================
+   DASHBOARD STATISTICS
+========================================================= */
+
+.statsGrid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(5,1fr);
+
+    gap:12px;
+
+    margin-bottom:18px;
+}
+
+.statCard{
+
+    background:white;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:12px;
+
+    padding:17px;
+
+    box-shadow:var(--shadow);
+
+    position:relative;
+
+    overflow:hidden;
+}
+
+.statCard::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+
+    top:0;
+
+    bottom:0;
+
+    width:3px;
+
+    background:var(--blue);
+}
+
+.statLabel{
+
+    color:var(--muted);
+
+    font-size:8px;
+
+    font-weight:800;
+
+    letter-spacing:.8px;
+}
+
+.statValue{
+
+    margin-top:8px;
+
+    color:var(--navy);
+
+    font-size:22px;
+
+    font-weight:900;
+}
+
+.statSub{
+
+    margin-top:4px;
+
+    color:#8194a3;
+
+    font-size:8px;
+}
+
+.statGreen::before{
+
+    background:var(--green);
+}
+
+.statRed::before{
+
+    background:var(--red);
+}
+
+.statYellow::before{
+
+    background:var(--yellow);
+}
+
+.statCyan::before{
+
+    background:var(--cyan);
+}
+
+
+/* =========================================================
+   GRID
+========================================================= */
+
+.twoColumn{
+
+    display:grid;
+
+    grid-template-columns:
+        1.5fr
+        1fr;
+
+    gap:16px;
+
+    margin-bottom:16px;
+}
+
+.card{
+
+    background:
+        var(--card);
+
+    border:
+        1px solid var(--border);
+
+    border-radius:14px;
+
+    box-shadow:
+        var(--shadow);
+
+    overflow:hidden;
+}
+
+.cardHeader{
+
+    padding:
+        16px 18px;
+
+    border-bottom:
+        1px solid var(--border);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:10px;
+}
+
+.cardTitle{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:9px;
+
+    font-size:11px;
+
+    font-weight:900;
+
+    color:var(--navy);
+
+    letter-spacing:.2px;
+}
+
+.cardIcon{
+
+    width:29px;
+
+    height:29px;
+
+    display:grid;
+
+    place-items:center;
+
+    border-radius:7px;
+
+    background:#e8f5fc;
+
+    color:var(--blue);
+
+    font-size:14px;
+}
+
+.cardHint{
+
+    color:#8a9cab;
+
+    font-size:7px;
+
+    font-weight:800;
+
+    letter-spacing:.7px;
+}
+
+.cardBody{
+
+    padding:18px;
+}
+
+
+/* =========================================================
+   MAP
+========================================================= */
+
+#map{
+
+    width:100%;
+
+    height:520px;
+
+    border-radius:10px;
+
+    overflow:hidden;
+
+    border:
+        1px solid
+        #d3e1e9;
+}
+
+.mapFooter{
+
+    margin-top:12px;
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:16px;
+
+    color:var(--muted);
+
+    font-size:8px;
+}
+
+.legend{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:6px;
+}
+
+.legendDot{
+
+    width:9px;
+
+    height:9px;
+
+    border-radius:50%;
+}
+
+.legendLine{
+
+    width:22px;
+
+    height:3px;
+
+    border-radius:4px;
+}
+
+
+/* =========================================================
+   DIAGNOSTIC CONTROL
+========================================================= */
+
+.controlInfo{
+
+    padding:13px;
+
+    background:#f2f8fb;
+
+    border:
+        1px solid
+        #dbeaf1;
+
+    border-radius:9px;
+
+    color:var(--muted);
+
+    font-size:9px;
+
+    line-height:1.7;
+
+    margin-bottom:16px;
+}
+
+.controlInfo strong{
+
+    color:var(--navy);
+}
+
+.field{
+
+    margin-bottom:13px;
+}
+
+.field label{
+
+    display:block;
+
+    margin-bottom:6px;
+
+    color:#657b8b;
+
+    font-size:8px;
+
+    font-weight:900;
+
+    letter-spacing:.7px;
+}
+
+select{
+
+    width:100%;
+
+    padding:11px;
+
+    border:
+        1px solid
+        #cddde6;
+
+    border-radius:8px;
+
+    background:white;
+
+    color:var(--text);
+
+    outline:none;
+
+    font-size:10px;
+}
+
+select:focus{
+
+    border-color:
+        var(--blue);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(8,121,217,.08);
+}
+
+button{
+
+    border:0;
+
+    cursor:pointer;
+
+    border-radius:8px;
+
+    padding:12px 15px;
+
+    font-size:9px;
+
+    font-weight:900;
+
+    transition:.2s;
+}
+
+.runButton{
+
+    width:100%;
+
+    color:white;
+
+    background:
+        linear-gradient(
+            90deg,
+            #086ec7,
+            #0fa9e8
+        );
+
+    box-shadow:
+        0 6px 16px
+        rgba(8,121,217,.18);
+}
+
+.runButton:hover{
+
+    transform:
+        translateY(-1px);
+
+    box-shadow:
+        0 9px 22px
+        rgba(8,121,217,.25);
+}
+
+.resetButton{
+
+    width:100%;
+
+    margin-top:8px;
+
+    background:#f0f5f8;
+
+    color:#607789;
+
+    border:
+        1px solid
+        #d6e3ea;
+}
+
+.resetButton:hover{
+
+    background:#e8f0f4;
+}
+
+
+/* =========================================================
+   DIAGNOSTIC PIPELINE
+========================================================= */
+
+.pipeline{
+
+    margin-top:16px;
+
+    display:grid;
+
+    gap:8px;
+}
+
+.pipelineStep{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    padding:9px;
+
+    border:
+        1px solid
+        #e0eaf0;
+
+    border-radius:8px;
+
+    background:#fafcfd;
+}
+
+.pipelineNumber{
+
+    width:23px;
+
+    height:23px;
+
+    border-radius:50%;
+
+    display:grid;
+
+    place-items:center;
+
+    background:#e8f5fc;
+
+    color:var(--blue);
+
+    font-size:8px;
+
+    font-weight:900;
+}
+
+.pipelineText{
+
+    font-size:8px;
+
+    color:#526a7b;
+
+    font-weight:700;
+}
+
+
+/* =========================================================
+   RESULTS
+========================================================= */
+
+#results{
+
+    display:none;
+
+    margin-top:16px;
+}
+
+.resultGrid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap:12px;
+
+    margin-bottom:16px;
+}
+
+.resultBox{
+
+    background:white;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:12px;
+
+    padding:16px;
+
+    box-shadow:var(--shadow);
+}
+
+.resultLabel{
+
+    color:var(--muted);
+
+    font-size:7px;
+
+    font-weight:900;
+
+    letter-spacing:.8px;
+}
+
+.resultValue{
+
+    margin-top:8px;
+
+    font-size:23px;
+
+    font-weight:900;
+
+    color:var(--navy);
+
+    line-height:1.2;
+}
+
+.resultValue.blue{
+
+    color:var(--blue);
+}
+
+.resultValue.green{
+
+    color:var(--green);
+}
+
+.resultValue.red{
+
+    color:var(--red);
+}
+
+.resultSub{
+
+    margin-top:5px;
+
+    color:#8295a3;
+
+    font-size:8px;
+}
+
+
+/* =========================================================
+   CONFIDENCE
+========================================================= */
+
+.confidenceTrack{
+
+    height:9px;
+
+    margin-top:12px;
+
+    background:#e8eef2;
+
+    border-radius:20px;
+
+    overflow:hidden;
+}
+
+.confidenceFill{
+
+    height:100%;
+
+    width:0;
+
+    border-radius:20px;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--blue),
+            var(--cyan)
+        );
+
+    transition:
+        width 1s ease;
+}
+
+
+/* =========================================================
+   DIAGNOSIS PANEL
+========================================================= */
+
+.diagnosisGrid{
+
+    display:grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap:16px;
+}
+
+.diagnosisMain{
+
+    padding:20px;
+
+    border-radius:11px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #eef8fd,
+            #f9fcfe
+        );
+
+    border:
+        1px solid
+        #d8ebf4;
+}
+
+.diagnosisTitle{
+
+    color:#6d8392;
+
+    font-size:8px;
+
+    font-weight:900;
+
+    letter-spacing:.7px;
+}
+
+.diagnosisFault{
+
+    margin-top:8px;
+
+    color:var(--navy);
+
+    font-size:27px;
+
+    font-weight:900;
+}
+
+.severity{
+
+    display:inline-block;
+
+    margin-top:9px;
+
+    padding:
+        6px 10px;
+
+    border-radius:20px;
+
+    font-size:7px;
+
+    font-weight:900;
+
+    letter-spacing:.8px;
+}
+
+.severityCritical{
+
+    color:#a92432;
+
+    background:#ffe7ea;
+}
+
+.severityHigh{
+
+    color:#9b5d00;
+
+    background:#fff1d1;
+}
+
+.severityMedium{
+
+    color:#216a5b;
+
+    background:#dff8ef;
+}
+
+.diagnosisDescription{
+
+    margin-top:12px;
+
+    color:#607686;
+
+    font-size:9px;
+
+    line-height:1.75;
+}
+
+.evidenceList{
+
+    display:grid;
+
+    gap:9px;
+}
+
+.evidence{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    gap:10px;
+
+    padding:11px;
+
+    background:#f9fbfc;
+
+    border:
+        1px solid
+        #e1e9ee;
+
+    border-radius:8px;
+}
+
+.evidence span{
+
+    color:#738795;
+
+    font-size:8px;
+}
+
+.evidence strong{
+
+    color:var(--navy);
+
+    font-size:8px;
+
+    text-align:right;
+}
+
+
+/* =========================================================
+   MEASUREMENTS
+========================================================= */
+
+.measureGrid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(5,1fr);
+
+    gap:9px;
+}
+
+.measurement{
+
+    padding:14px;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:9px;
+
+    background:#fbfdfe;
+}
+
+.measurement label{
+
+    display:block;
+
+    color:#758a99;
+
+    font-size:7px;
+
+    font-weight:800;
+
+    letter-spacing:.5px;
+}
+
+.measurement strong{
+
+    display:block;
+
+    margin-top:7px;
+
+    color:var(--navy);
+
+    font-size:16px;
+}
+
+
+/* =========================================================
+   LOCALIZATION
+========================================================= */
+
+.localizationGrid{
+
+    display:grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap:16px;
+}
+
+.locationCard{
+
+    padding:18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f2f9fd,
+            #ffffff
+        );
+
+    border:
+        1px solid
+        #dcebf2;
+
+    border-radius:11px;
+}
+
+.locationDistance{
+
+    font-size:34px;
+
+    color:var(--blue);
+
+    font-weight:900;
+
+    letter-spacing:-1px;
+}
+
+.locationName{
+
+    margin-top:5px;
+
+    font-size:14px;
+
+    color:var(--navy);
+
+    font-weight:900;
+}
+
+.locationDescription{
+
+    margin-top:10px;
+
+    color:#647b8a;
+
+    font-size:9px;
+
+    line-height:1.7;
+}
+
+.locationMetrics{
+
+    display:grid;
+
+    gap:9px;
+}
+
+.locationMetric{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    padding:11px;
+
+    border-radius:8px;
+
+    background:#f8fafb;
+
+    border:
+        1px solid
+        #e0e8ed;
+}
+
+.locationMetric span{
+
+    color:#748997;
+
+    font-size:8px;
+}
+
+.locationMetric strong{
+
+    color:var(--navy);
+
+    font-size:8px;
+}
+
+
+/* =========================================================
+   CANDIDATES
+========================================================= */
+
+.candidate{
+
+    display:grid;
+
+    grid-template-columns:
+        190px
+        1fr
+        70px;
+
+    gap:12px;
+
+    align-items:center;
+
+    padding:
+        12px 0;
+
+    border-bottom:
+        1px solid
+        #e5edf1;
+}
+
+.candidate:last-child{
+
+    border-bottom:0;
+}
+
+.candidateName{
+
+    color:#50697a;
+
+    font-size:8px;
+
+    font-weight:700;
+}
+
+.candidate.best .candidateName{
+
+    color:var(--green);
+
+    font-weight:900;
+}
+
+.candidateBar{
+
+    height:8px;
+
+    border-radius:20px;
+
+    background:#e9eff3;
+
+    overflow:hidden;
+}
+
+.candidateFill{
+
+    height:100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--blue),
+            var(--cyan)
+        );
+
+    border-radius:20px;
+}
+
+.candidate.best .candidateFill{
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--green),
+            var(--green2)
+        );
+}
+
+.candidateScore{
+
+    text-align:right;
+
+    color:#657c8d;
+
+    font-size:8px;
+
+    font-weight:900;
+}
+
+
+/* =========================================================
+   TECHNICIAN
+========================================================= */
+
+.techGrid{
+
+    display:grid;
+
+    grid-template-columns:
+        1.3fr
+        1fr;
+
+    gap:16px;
+}
+
+.techGuidance{
+
+    padding:18px;
+
+    border-radius:11px;
+
+    background:
+        #f3f9fc;
+
+    border-left:
+        4px solid
+        var(--blue);
+}
+
+.techGuidance h3{
+
+    font-size:11px;
+
+    color:var(--navy);
+
+    margin-bottom:8px;
+}
+
+.techGuidance p{
+
+    color:#607889;
+
+    font-size:9px;
+
+    line-height:1.75;
+}
+
+.actionList{
+
+    margin-top:14px;
+
+    display:grid;
+
+    gap:8px;
+}
+
+.action{
+
+    display:grid;
+
+    grid-template-columns:
+        27px
+        1fr;
+
+    gap:9px;
+
+    padding:9px;
+
+    border:
+        1px solid
+        #dce7ed;
+
+    border-radius:8px;
+
+    background:white;
+}
+
+.actionNumber{
+
+    width:23px;
+
+    height:23px;
+
+    display:grid;
+
+    place-items:center;
+
+    border-radius:50%;
+
+    background:#e8f5fc;
+
+    color:var(--blue);
+
+    font-size:8px;
+
+    font-weight:900;
+}
+
+.actionText{
+
+    color:#526c7c;
+
+    font-size:8px;
+
+    line-height:1.6;
+}
+
+.techInfo{
+
+    display:grid;
+
+    gap:9px;
+}
+
+.techItem{
+
+    padding:13px;
+
+    background:#fafcfd;
+
+    border:
+        1px solid
+        #e0e9ee;
+
+    border-radius:8px;
+}
+
+.techItem label{
+
+    display:block;
+
+    color:#7a8f9e;
+
+    font-size:7px;
+
+    font-weight:800;
+
+    letter-spacing:.5px;
+}
+
+.techItem strong{
+
+    display:block;
+
+    margin-top:6px;
+
+    color:var(--navy);
+
+    font-size:10px;
+
+    line-height:1.4;
+}
+
+
+/* =========================================================
+   EVENT LOG
+========================================================= */
+
+.log{
+
+    height:210px;
+
+    overflow:auto;
+
+    padding:13px;
+
+    background:
+        #061522;
+
+    border-radius:9px;
+
+    color:#91b0c2;
+
+    font-family:
+        Consolas,
+        monospace;
+
+    font-size:8px;
+
+    line-height:1.9;
+}
+
+.logLine{
+
+    padding:1px 0;
+}
+
+.logSuccess{
+
+    color:#45e0a4;
+}
+
+.logWarning{
+
+    color:#ffd166;
+}
+
+.logDanger{
+
+    color:#ff6877;
+}
+
+.logInfo{
+
+    color:#7ecbff;
+}
+
+
+/* =========================================================
+   METHODOLOGY
+========================================================= */
+
+.methodGrid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(6,1fr);
+
+    gap:9px;
+}
+
+.method{
+
+    padding:14px;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:9px;
+
+    background:#fbfdfe;
+}
+
+.methodNumber{
+
+    width:25px;
+
+    height:25px;
+
+    border-radius:50%;
+
+    display:grid;
+
+    place-items:center;
+
+    background:#e8f5fc;
+
+    color:var(--blue);
+
+    font-size:8px;
+
+    font-weight:900;
+
+    margin-bottom:9px;
+}
+
+.method strong{
+
+    display:block;
+
+    color:var(--navy);
+
+    font-size:9px;
+
+    margin-bottom:5px;
+}
+
+.method span{
+
+    color:#708694;
+
+    font-size:8px;
+
+    line-height:1.55;
+}
+
+
+/* =========================================================
+   ENGINEERING NOTE
+========================================================= */
+
+.note{
+
+    padding:16px;
+
+    background:#f4f9fb;
+
+    border-left:
+        4px solid
+        var(--cyan);
+
+    border-radius:8px;
+
+    color:#607889;
+
+    font-size:9px;
+
+    line-height:1.8;
+}
+
+.note strong{
+
+    color:var(--navy);
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+footer{
+
+    background:
+        var(--navy);
+
+    color:#8da8ba;
+
+    text-align:center;
+
+    padding:25px;
+
+    font-size:8px;
+
+    line-height:1.8;
+}
+
+footer strong{
+
+    color:white;
+}
+
+
+/* =========================================================
+   LEAFLET
+========================================================= */
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip{
+
+    background:#ffffff;
+
+    color:var(--text);
+}
+
+.popupTitle{
+
+    color:var(--blue);
+
+    font-size:12px;
+
+    font-weight:900;
+
+    margin-bottom:5px;
+}
+
+.popupText{
+
+    font-size:9px;
+
+    line-height:1.6;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:1100px){
+
+    .statsGrid{
+
+        grid-template-columns:
+            repeat(3,1fr);
+    }
+
+    .twoColumn{
+
+        grid-template-columns:1fr;
+    }
+
+    .resultGrid{
+
+        grid-template-columns:
+            repeat(2,1fr);
+    }
+
+    .methodGrid{
+
+        grid-template-columns:
+            repeat(3,1fr);
+    }
+
+    .measureGrid{
+
+        grid-template-columns:
+            repeat(3,1fr);
+    }
+}
+
+@media(max-width:800px){
+
+    .navbar{
+
+        overflow-x:auto;
+    }
+
+    .pageHeader{
+
+        align-items:flex-start;
+
+        flex-direction:column;
+    }
+
+    .diagnosisGrid,
+    .localizationGrid,
+    .techGrid{
+
+        grid-template-columns:1fr;
+    }
+
+    .resultGrid{
+
+        grid-template-columns:1fr 1fr;
+    }
+}
+
+@media(max-width:600px){
+
+    .topbar{
+
+        padding:
+            0 3%;
+    }
+
+    .systemStatus{
+
+        display:none;
+    }
+
+    main{
+
+        width:94%;
+    }
+
+    .statsGrid,
+    .resultGrid,
+    .measureGrid,
+    .methodGrid{
+
+        grid-template-columns:1fr;
+    }
+
+    #map{
+
+        height:400px;
+    }
+
+    .candidate{
+
+        grid-template-columns:
+            125px
+            1fr
+            55px;
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     NOC HEADER
+========================================================= -->
+
+<header class="topbar">
+
+    <div class="brand">
+
+        <div class="logo">
+            F
+        </div>
+
+        <div>
+
+            <div class="brandName">
+                FiberIQ
+            </div>
+
+            <div class="brandSub">
+                FIBRE FAULT LOCATOR
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="systemStatus">
+
+        <div class="onlineBadge">
+
+            <span class="onlineDot"></span>
+
+            SYSTEM ONLINE
+
+        </div>
+
+        <div
+            id="clock"
+            class="clock"
+        >
+            Loading...
+        </div>
+
+    </div>
+
+</header>
+
+
+<!-- =========================================================
+     NAVIGATION
+========================================================= -->
+
+<nav class="navbar">
+
+    <div class="navItem active">
+        NOC DASHBOARD
+    </div>
+
+    <div class="navItem">
+        NETWORK
+    </div>
+
+    <div class="navItem">
+        DIAGNOSTICS
+    </div>
+
+    <div class="navItem">
+        LOCALIZATION
+    </div>
+
+    <div class="navItem">
+        TECHNICIAN
+    </div>
+
+</nav>
+
+
+<main>
+
+
+<!-- =========================================================
+     PAGE HEADER
+========================================================= -->
+
+<section class="pageHeader">
+
+    <div>
+
+        <h1>
+            Fibre Fault Diagnosis & Localization
+        </h1>
+
+        <p>
+            Software-based diagnostic and topology
+            correlation environment for fibre network
+            fault investigation.
+        </p>
+
+    </div>
+
+    <div class="pageTag">
+        ENGINEERING PROJECT PROTOTYPE
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     DASHBOARD STATISTICS
+========================================================= -->
+
+<section class="statsGrid">
+
+
+    <div class="statCard statGreen">
+
+        <div class="statLabel">
+            SYSTEM STATUS
+        </div>
+
+        <div class="statValue">
+            ONLINE
+        </div>
+
+        <div class="statSub">
+            Diagnostic engine ready
+        </div>
+
+    </div>
+
+
+    <div class="statCard">
+
+        <div class="statLabel">
+            NETWORK NODES
+        </div>
+
+        <div
+            id="nodeCount"
+            class="statValue"
+        >
+            --
+        </div>
+
+        <div class="statSub">
+            Simulated topology
+        </div>
+
+    </div>
+
+
+    <div class="statCard statCyan">
+
+        <div class="statLabel">
+            ROUTE LENGTH
+        </div>
+
+        <div
+            id="routeDistance"
+            class="statValue"
+        >
+            --
+        </div>
+
+        <div class="statSub">
+            Base-to-end route
+        </div>
+
+    </div>
+
+
+    <div class="statCard statYellow">
+
+        <div class="statLabel">
+            ACTIVE FAULTS
+        </div>
+
+        <div
+            id="activeFault"
+            class="statValue"
+        >
+            00
+        </div>
+
+        <div class="statSub">
+            Current simulation
+        </div>
+
+    </div>
+
+
+    <div class="statCard">
+
+        <div class="statLabel">
+            DIAGNOSTIC MODE
+        </div>
+
+        <div class="statValue">
+            AUTO
+        </div>
+
+        <div class="statSub">
+            Automatic analysis
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     MAP + CONTROL
+========================================================= -->
+
+<section class="twoColumn">
+
+
+<!-- MAP -->
+
+<div class="card">
+
+    <div class="cardHeader">
+
+        <div class="cardTitle">
+
+            <div class="cardIcon">
+                🗺
+            </div>
+
+            NETWORK TOPOLOGY
+
+        </div>
+
+        <div class="cardHint">
+            GABORONE SIMULATION
+        </div>
+
+    </div>
+
+    <div class="cardBody">
+
+        <div id="map"></div>
+
+        <div class="mapFooter">
+
+            <div class="legend">
+
+                <span
+                    class="legendDot"
+                    style="background:#18b77a"
+                ></span>
+
+                Base
+
+            </div>
+
+            <div class="legend">
+
+                <span
+                    class="legendDot"
+                    style="background:#12a8ff"
+                ></span>
+
+                Network node
+
+            </div>
+
+            <div class="legend">
+
+                <span
+                    class="legendDot"
+                    style="background:#e84c5b"
+                ></span>
+
+                Estimated fault
+
+            </div>
+
+            <div class="legend">
+
+                <span
+                    class="legendLine"
+                    style="background:#12a8ff"
+                ></span>
+
+                Fibre route
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- CONTROL -->
+
+<div class="card">
+
+    <div class="cardHeader">
+
+        <div class="cardTitle">
+
+            <div class="cardIcon">
+                ⚙
+            </div>
+
+            DIAGNOSTIC CONTROL
+
+        </div>
+
+        <div class="cardHint">
+            AUTOMATIC MODE
+        </div>
+
+    </div>
+
+    <div class="cardBody">
+
+
+        <div class="controlInfo">
+
+            <strong>
+                FiberIQ diagnostic workflow
+            </strong>
+
+            <br>
+
+            The system generates a simulated abnormal
+            optical condition, analyzes the diagnostic
+            evidence, estimates the fault distance and
+            correlates the result with the known network
+            topology.
+
+            <br><br>
+
+            The hidden simulation fault is used only for
+            <strong>
+                post-diagnostic validation
+            </strong>.
+            It is not used by the localization engine.
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                SIMULATION SCENARIO
+            </label>
+
+            <select id="scenario">
+
+                <option value="automatic">
+                    Automatic — Random Route Position
+                </option>
+
+                <option value="near">
+                    Near Base — 0.5 to 2.5 km
+                </option>
+
+                <option value="middle">
+                    Mid Route — 3.0 to 5.8 km
+                </option>
+
+                <option value="far">
+                    Far Route — 6.0 to 8.4 km
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <button
+            class="runButton"
+            onclick="runDiagnostic()"
+        >
+            ▶ RUN FIBRE FAULT DIAGNOSTIC
+        </button>
+
+
+        <button
+            class="resetButton"
+            onclick="resetSystem()"
+        >
+            ↻ RESET DIAGNOSTIC
+        </button>
+
+
+        <div class="pipeline">
+
+            <div class="pipelineStep">
+
+                <div class="pipelineNumber">
+                    1
+                </div>
+
+                <div class="pipelineText">
+                    Generate diagnostic event
+                </div>
+
+            </div>
+
+
+            <div class="pipelineStep">
+
+                <div class="pipelineNumber">
+                    2
+                </div>
+
+                <div class="pipelineText">
+                    Analyze optical condition
+                </div>
+
+            </div>
+
+
+            <div class="pipelineStep">
+
+                <div class="pipelineNumber">
+                    3
+                </div>
+
+                <div class="pipelineText">
+                    Classify probable fault
+                </div>
+
+            </div>
+
+
+            <div class="pipelineStep">
+
+                <div class="pipelineNumber">
+                    4
+                </div>
+
+                <div class="pipelineText">
+                    Estimate fault distance
+                </div>
+
+            </div>
+
+
+            <div class="pipelineStep">
+
+                <div class="pipelineNumber">
+                    5
+                </div>
+
+                <div class="pipelineText">
+                    Correlate with topology
+                </div>
+
+            </div>
+
+
+            <div class="pipelineStep">
+
+                <div class="pipelineNumber">
+                    6
+                </div>
+
+                <div class="pipelineText">
+                    Generate technician response
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</section>
+
+
+<!-- =========================================================
+     RESULTS
+========================================================= -->
+
+<section id="results">
+
+
+<!-- =========================================================
+     SUMMARY
+========================================================= -->
+
+<div class="resultGrid">
+
+
+    <div class="resultBox">
+
+        <div class="resultLabel">
+            ESTIMATED FAULT DISTANCE
+        </div>
+
+        <div
+            id="estimatedDistance"
+            class="resultValue blue"
+        >
+            --
+        </div>
+
+        <div class="resultSub">
+            From New Era College reference point
+        </div>
+
+    </div>
+
+
+    <div class="resultBox">
+
+        <div class="resultLabel">
+            PROBABLE FAULT AREA
+        </div>
+
+        <div
+            id="estimatedArea"
+            class="resultValue"
+        >
+            --
+        </div>
+
+        <div class="resultSub">
+            Topology correlation
+        </div>
+
+    </div>
+
+
+    <div class="resultBox">
+
+        <div class="resultLabel">
+            LOCALIZATION CONFIDENCE
+        </div>
+
+        <div
+            id="localizationConfidence"
+            class="resultValue green"
+        >
+            --
+        </div>
+
+        <div class="confidenceTrack">
+
+            <div
+                id="confidenceFill"
+                class="confidenceFill"
+            ></div>
+
+        </div>
+
+    </div>
+
+
+    <div class="resultBox">
+
+        <div class="resultLabel">
+            ESTIMATION UNCERTAINTY
+        </div>
+
+        <div
+            id="uncertainty"
+            class="resultValue"
+        >
+            --
+        </div>
+
+        <div class="resultSub">
+            Approximate distance interval
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     AUTOMATIC DIAGNOSIS
+========================================================= -->
+
+<div class="card">
+
+    <div class="cardHeader">
+
+        <div class="cardTitle">
+
+            <div class="cardIcon">
+                🧠
+            </div>
+
+            AUTOMATIC FAULT DIAGNOSIS
+
+        </div>
+
+        <div class="cardHint">
+            DIAGNOSTIC ENGINE OUTPUT
+        </div>
+
+    </div>
+
+
+    <div class="cardBody">
+
+
+        <div class="diagnosisGrid">
+
+
+            <div class="diagnosisMain">
+
+                <div class="diagnosisTitle">
+                    PROBABLE FAULT
+                </div>
+
+                <div
+                    id="diagnosisType"
+                    class="diagnosisFault"
+                >
+                    --
+                </div>
+
+                <span
+                    id="severity"
+                    class="severity"
+                >
+                    --
+                </span>
+
+                <p
+                    id="diagnosisDescription"
+                    class="diagnosisDescription"
+                >
+                    --
+                </p>
+
+            </div>
+
+
+            <div class="evidenceList">
+
+
+                <div class="evidence">
+
+                    <span>
+                        Fault signature
+                    </span>
+
+                    <strong id="faultSignature">
+                        --
+                    </strong>
+
+                </div>
+
+
+                <div class="evidence">
+
+                    <span>
+                        Classification confidence
+                    </span>
+
+                    <strong id="classificationConfidence">
+                        --
+                    </strong>
+
+                </div>
+
+
+                <div class="evidence">
+
+                    <span>
+                        Diagnostic basis
+                    </span>
+
+                    <strong>
+                        Optical condition analysis
+                    </strong>
+
+                </div>
+
+
+                <div class="evidence">
+
+                    <span>
+                        Analysis mode
+                    </span>
+
+                    <strong>
+                        Automatic
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     OPTICAL MEASUREMENTS
+========================================================= -->
+
+<div class="card" style="margin-top:16px">
+
+    <div class="cardHeader">
+
+        <div class="cardTitle">
+
+            <div class="cardIcon">
+                📡
+            </div>
+
+            OPTICAL CONDITION
+
+        </div>
+
+        <div class="cardHint">
+            SIMULATED ENGINEERING DATA
+        </div>
+
+    </div>
+
+
+    <div class="cardBody">
+
+        <div class="measureGrid">
+
+
+            <div class="measurement">
+
+                <label>
+                    REFERENCE TX
+                </label>
+
+                <strong id="txPower">
+                    --
+                </strong>
+
+            </div>
+
+
+            <div class="measurement">
+
+                <label>
+                    EXPECTED RX
+                </label>
+
+                <strong id="expectedRx">
+                    --
+                </strong>
+
+            </div>
+
+
+            <div class="measurement">
+
+                <label>
+                    OBSERVED RX
+                </label>
+
+                <strong id="observedRx">
+                    --
+                </strong>
+
+            </div>
+
+
+            <div class="measurement">
+
+                <label>
+                    TOTAL PATH LOSS
+                </label>
+
+                <strong id="totalLoss">
+                    --
+                </strong>
+
+            </div>
+
+
+            <div class="measurement">
+
+                <label>
+                    ABNORMAL LOSS
+                </label>
+
+                <strong id="additionalLoss">
+                    --
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     LOCALIZATION
+========================================================= -->
+
+<div class="card" style="margin-top:16px">
+
+    <div class="cardHeader">
+
+        <div class="cardTitle">
+
+            <div class="cardIcon">
+                🎯
+            </div>
+
+            FAULT LOCALIZATION
+
+        </div>
+
+        <div class="cardHint">
+            TOPOLOGY-AWARE ESTIMATION
+        </div>
+
+    </div>
+
+
+    <div class="cardBody">
+
+        <div class="localizationGrid">
+
+
+            <div class="locationCard">
+
+                <div class="resultLabel">
+                    ESTIMATED ROUTE POSITION
+                </div>
+
+                <div
+                    id="locationDistance"
+                    class="locationDistance"
+                >
+                    --
+                </div>
+
+                <div
+                    id="locationName"
+                    class="locationName"
+                >
+                    --
+                </div>
+
+                <p
+                    id="locationDescription"
+                    class="locationDescription"
+                >
+                    --
+                </p>
+
+            </div>
+
+
+            <div class="locationMetrics">
+
+
+                <div class="locationMetric">
+
+                    <span>
+                        Ground-truth distance
+                    </span>
+
+                    <strong id="actualDistance">
+                        --
+                    </strong>
+
+                </div>
+
+
+                <div class="locationMetric">
+
+                    <span>
+                        Estimated distance
+                    </span>
+
+                    <strong id="validationEstimated">
+                        --
+                    </strong>
+
+                </div>
+
+
+                <div class="locationMetric">
+
+                    <span>
+                        Localization error
+                    </span>
+
+                    <strong id="localizationError">
+                        --
+                    </strong>
+
+                </div>
+
+
+                <div class="locationMetric">
+
+                    <span>
+                        Validation status
+                    </span>
+
+                    <strong id="validationStatus">
+                        --
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     CANDIDATES
+========================================================= -->
+
+<div class="card" style="margin-top:16px">
+
+    <div class="cardHeader">
+
+        <div class="cardTitle">
+
+            <div class="cardIcon">
+                🧭
+            </div>
+
+            TOPOLOGY CANDIDATE AREAS
+
+        </div>
+
+        <div class="cardHint">
+            PROBABILITY RANKING
+        </div>
+
+    </div>
+
+
+    <div class="cardBody">
+
+        <div id="candidateList"></div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     TECHNICIAN
+========================================================= -->
+
+<div class="card" style="margin-top:16px">
+
+    <div class="cardHeader">
+
+        <div class="cardTitle">
+
+            <div class="cardIcon">
+                🛠
+            </div>
+
+            TECHNICIAN DECISION SUPPORT
+
+        </div>
+
+        <div class="cardHint">
+            FIELD RESPONSE
+        </div>
+
+    </div>
+
+
+    <div class="cardBody">
+
+        <div class="techGrid">
+
+
+            <div class="techGuidance">
+
+                <h3>
+                    Recommended Field Response
+                </h3>
+
+                <p
+                    id="technicianGuidance"
+                >
+                    --
+                </p>
+
+
+                <div
+                    id="actionList"
+                    class="actionList"
+                ></div>
+
+            </div>
+
+
+            <div class="techInfo">
+
+
+                <div class="techItem">
+
+                    <label>
+                        ESTIMATED FAULT AREA
+                    </label>
+
+                    <strong id="techLocation">
+                        --
+                    </strong>
+
+                </div>
+
+
+                <div class="techItem">
+
+                    <label>
+                        PRIORITY
+                    </label>
+
+                    <strong id="techPriority">
+                        --
+                    </strong>
+
+                </div>
+
+
+                <div class="techItem">
+
+                    <label>
+                        FIRST RECOMMENDED ACTION
+                    </label>
+
+                    <strong id="techAction">
+                        --
+                    </strong>
+
+                </div>
+
+
+                <div class="techItem">
+
+                    <label>
+                        REFERENCE POINT
+                    </label>
+
+                    <strong>
+                        New Era College
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     EVENT LOG
+========================================================= -->
+
+<div class="card" style="margin-top:16px">
+
+    <div class="cardHeader">
+
+        <div class="cardTitle">
+
+            <div class="cardIcon">
+                📋
+            </div>
+
+            DIAGNOSTIC EVENT LOG
+
+        </div>
+
+        <div class="cardHint">
+            SYSTEM ACTIVITY
+        </div>
+
+    </div>
+
+
+    <div class="cardBody">
+
+        <div
+            id="eventLog"
+            class="log"
+        ></div>
+
+    </div>
+
+</div>
+
+
+</section>
+
+
+<!-- =========================================================
+     METHODOLOGY
+========================================================= -->
+
+<div class="card" style="margin-top:16px">
+
+    <div class="cardHeader">
+
+        <div class="cardTitle">
+
+            <div class="cardIcon">
+                🔬
+            </div>
+
+            FIBERIQ DIAGNOSTIC METHODOLOGY
+
+        </div>
+
+        <div class="cardHint">
+            SYSTEM PROCESS
+        </div>
+
+    </div>
+
+
+    <div class="cardBody">
+
+        <div class="methodGrid">
+
+
+            <div class="method">
+
+                <div class="methodNumber">
+                    1
+                </div>
+
+                <strong>
+                    Detect
+                </strong>
+
+                <span>
+                    Identify an abnormal simulated
+                    fibre condition.
+                </span>
+
+            </div>
+
+
+            <div class="method">
+
+                <div class="methodNumber">
+                    2
+                </div>
+
+                <strong>
+                    Measure
+                </strong>
+
+                <span>
+                    Compare expected and observed
+                    optical conditions.
+                </span>
+
+            </div>
+
+
+            <div class="method">
+
+                <div class="methodNumber">
+                    3
+                </div>
+
+                <strong>
+                    Classify
+                </strong>
+
+                <span>
+                    Determine the most probable
+                    fault category.
+                </span>
+
+            </div>
+
+
+            <div class="method">
+
+                <div class="methodNumber">
+                    4
+                </div>
+
+                <strong>
+                    Estimate
+                </strong>
+
+                <span>
+                    Estimate fault distance from
+                    diagnostic evidence.
+                </span>
+
+            </div>
+
+
+            <div class="method">
+
+                <div class="methodNumber">
+                    5
+                </div>
+
+                <strong>
+                    Correlate
+                </strong>
+
+                <span>
+                    Compare the estimated distance
+                    with network topology.
+                </span>
+
+            </div>
+
+
+            <div class="method">
+
+                <div class="methodNumber">
+                    6
+                </div>
+
+                <strong>
+                    Recommend
+                </strong>
+
+                <span>
+                    Produce a prioritized technician
+                    investigation response.
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     ENGINEERING NOTE
+========================================================= -->
+
+<div class="card" style="margin-top:16px">
+
+    <div class="cardHeader">
+
+        <div class="cardTitle">
+
+            <div class="cardIcon">
+                ⚙
+            </div>
+
+            ENGINEERING SCOPE
+
+        </div>
+
+        <div class="cardHint">
+            PROJECT LIMITATIONS
+        </div>
+
+    </div>
+
+
+    <div class="cardBody">
+
+        <div class="note">
+
+            <strong>
+                Important engineering distinction:
+            </strong>
+
+            FiberIQ is a software-based engineering
+            prototype. It does not directly measure a
+            physical fibre using a VFL, OTDR or optical
+            power meter.
+
+            <br><br>
+
+            A conventional Visual Fault Locator provides
+            visible red-light indication of faults such as
+            breaks, bends or leakage at accessible points.
+            FiberIQ demonstrates how a software diagnostic
+            layer can use available diagnostic measurements
+            and known network topology to assist fault
+            diagnosis and localization.
+
+            <br><br>
+
+            The simulated ground-truth fault is retained
+            only to evaluate the accuracy of the
+            localization algorithm. It is deliberately
+            separated from the diagnostic calculation.
+
+        </div>
+
+    </div>
+
+</div>
+
+
+</main>
+
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+
+<footer>
+
+    <strong>
+        FiberIQ
+    </strong>
+
+    · Fibre Fault Diagnosis & Localization System
+
+    <br>
+
+    New Era College of Arts, Science & Technology
+    · Gaborone, Botswana
+
+    <br>
+
+    Engineering Project Prototype
+
+    <br>
+
+    All topology, optical measurements and fault events
+    displayed by this prototype are simulated.
+
+</footer>
+
+
+<!-- =========================================================
+     LEAFLET
+========================================================= -->
+
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
+
+
+<script>
+
+/* =========================================================
+   FIBERIQ APPLICATION ENGINE
+========================================================= */
+
+
+/* =========================================================
+   1. NETWORK TOPOLOGY
+========================================================= */
+
+const networkLocations = [
+
+    {
+        id:"NEC",
+        name:"New Era College",
+        short:"NEC",
+
+        lat:-24.5905,
+        lng:25.9235,
+
+        distance:0,
+
+        base:true
+    },
+
+    {
+        id:"AIRPORT_JUNCTION",
+        name:"Airport Junction",
+        short:"Airport Junction",
+
+        lat:-24.5798,
+        lng:25.9258,
+
+        distance:1.45
+    },
+
+    {
+        id:"BLOCK8",
+        name:"Block 8",
+        short:"Block 8",
+
+        lat:-24.5857,
+        lng:25.9180,
+
+        distance:2.35
+    },
+
+    {
+        id:"PHAKALANE",
+        name:"Phakalane",
+        short:"Phakalane",
+
+        lat:-24.5558,
+        lng:25.9690,
+
+        distance:5.20
+    },
+
+    {
+        id:"CBD",
+        name:"Gaborone CBD",
+        short:"Gaborone CBD",
+
+        lat:-24.6580,
+        lng:25.9122,
+
+        distance:7.80
+    },
+
+    {
+        id:"MAIN_MALL",
+        name:"Main Mall",
+        short:"Main Mall",
+
+        lat:-24.6550,
+        lng:25.9070,
+
+        distance:8.65
+    }
+
+];
+
+
+const totalRouteDistance =
+    networkLocations[
+        networkLocations.length - 1
+    ].distance;
+
+
+/* =========================================================
+   2. MAP INITIALIZATION
+========================================================= */
+
+const map =
+    L.map(
+        "map"
+    ).setView(
+
+        [
+            -24.61,
+            25.93
+        ],
+
+        12
+
+    );
+
+
+L.tileLayer(
+
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+
+    {
+
+        maxZoom:19,
+
+        attribution:
+            "&copy; OpenStreetMap contributors"
+
+    }
+
+).addTo(map);
+
+
+/* =========================================================
+   3. NETWORK MARKERS
+========================================================= */
+
+const markers = [];
+
+
+networkLocations.forEach(
+
+    location => {
+
+        const marker =
+            L.circleMarker(
+
+                [
+                    location.lat,
+                    location.lng
+                ],
+
+                {
+
+                    radius:
+                        location.base
+                        ? 9
+                        : 7,
+
+                    color:
+                        location.base
+                        ? "#18b77a"
+                        : "#12a8ff",
+
+                    fillColor:
+                        location.base
+                        ? "#18b77a"
+                        : "#12a8ff",
+
+                    fillOpacity:.9,
+
+                    weight:2
+
+                }
+
+            ).addTo(map);
+
+
+        marker.bindPopup(`
+
+            <div class="popupTitle">
+                ${location.name}
+            </div>
+
+            <div class="popupText">
+
+                Simulated network location.
+
+                <br><br>
+
+                Route distance:
+
+                <strong>
+                    ${location.distance.toFixed(2)} km
+                </strong>
+
+                <br>
+
+                ${
+                    location.base
+                    ? "Reference/base point"
+                    : "Network topology point"
+                }
+
+            </div>
+
+        `);
+
+
+        markers.push(marker);
+
+    }
+
+);
+
+
+/* =========================================================
+   4. FIBRE ROUTE
+========================================================= */
+
+const routeCoordinates =
+    networkLocations.map(
+
+        location => [
+
+            location.lat,
+            location.lng
+
+        ]
+
+    );
+
+
+const fibreRoute =
+    L.polyline(
+
+        routeCoordinates,
+
+        {
+
+            color:"#12a8ff",
+
+            weight:4,
+
+            opacity:.85
+
+        }
+
+    ).addTo(map);
+
+
+map.fitBounds(
+
+    fibreRoute.getBounds(),
+
+    {
+
+        padding:[
+            25,
+            25
+        ]
+
+    }
+
+);
+
+
+/* =========================================================
+   5. DASHBOARD VALUES
+========================================================= */
+
+document.getElementById(
+    "nodeCount"
+).textContent =
+    networkLocations.length;
+
+
+document.getElementById(
+    "routeDistance"
+).textContent =
+    totalRouteDistance.toFixed(2)
+    +
+    " km";
+
+
+/* =========================================================
+   6. CLOCK
+========================================================= */
+
+function updateClock(){
+
+    const now =
+        new Date();
+
+
+    const date =
+        now.toLocaleDateString(
+
+            "en-GB",
+
+            {
+
+                weekday:"short",
+
+                day:"2-digit",
+
+                month:"short",
+
+                year:"numeric",
+
+                timeZone:
+                    "Africa/Gaborone"
+
+            }
+
+        );
+
+
+    const time =
+        now.toLocaleTimeString(
+
+            "en-GB",
+
+            {
+
+                hour:"2-digit",
+
+                minute:"2-digit",
+
+                second:"2-digit",
+
+                timeZone:
+                    "Africa/Gaborone"
+
+            }
+
+        );
+
+
+    document.getElementById(
+        "clock"
+    ).textContent =
+        date
+        +
+        " · "
+        +
+        time;
+
+}
+
+
+updateClock();
+
+
+setInterval(
+    updateClock,
+    1000
+);
+
+
+/* =========================================================
+   7. OPTICAL REFERENCE MODEL
+========================================================= */
+
+const optical = {
+
+    txPower:3.0,
+
+    fiberAttenuation:0.35,
+
+    splitterLoss:10.5,
+
+    spliceLoss:0.20,
+
+    spliceCount:6,
+
+    connectorLoss:0.50,
+
+    connectorCount:2
+
+};
+
+
+/* =========================================================
+   8. FAULT DATABASE
+========================================================= */
+
+const faultTypes = {
+
+    cut:{
+
+        name:"Fibre Cut",
+
+        signature:
+            "Near-total optical interruption",
+
+        severity:"CRITICAL",
+
+        priority:"IMMEDIATE",
+
+        confidence:97
+
+    },
+
+
+    bend:{
+
+        name:"Macrobend / Fibre Bend",
+
+        signature:
+            "Localized excessive attenuation",
+
+        severity:"HIGH",
+
+        priority:"HIGH",
+
+        confidence:88
+
+    },
+
+
+    splice:{
+
+        name:"Abnormal Splice",
+
+        signature:
+            "Localized insertion loss",
+
+        severity:"MEDIUM",
+
+        priority:"MEDIUM",
+
+        confidence:84
+
+    },
+
+
+    connector:{
+
+        name:"Connector Fault",
+
+        signature:
+            "Abnormal connector insertion loss",
+
+        severity:"MEDIUM",
+
+        priority:"MEDIUM",
+
+        confidence:81
+
+    },
+
+
+    splitter:{
+
+        name:"Distribution / Splitter Fault",
+
+        signature:
+            "Distribution-side abnormal loss",
+
+        severity:"HIGH",
+
+        priority:"HIGH",
+
+        confidence:90
+
+    }
+
+};
+
+
+/* =========================================================
+   9. HEALTHY BASELINE
+========================================================= */
+
+function calculateHealthyBaseline(){
+
+    const fiberLoss =
+        totalRouteDistance
+        *
+        optical.fiberAttenuation;
+
+
+    const spliceLoss =
+        optical.spliceCount
+        *
+        optical.spliceLoss;
+
+
+    const connectorLoss =
+        optical.connectorCount
+        *
+        optical.connectorLoss;
+
+
+    const totalLoss =
+
+        fiberLoss
+        +
+        spliceLoss
+        +
+        connectorLoss
+        +
+        optical.splitterLoss;
+
+
+    const rx =
+        optical.txPower
+        -
+        totalLoss;
+
+
+    return {
+
+        fiberLoss,
+
+        spliceLoss,
+
+        connectorLoss,
+
+        splitterLoss:
+            optical.splitterLoss,
+
+        totalLoss,
+
+        rx
+
+    };
+
+}
+
+
+/* =========================================================
+   10. RANDOM HELPERS
+========================================================= */
+
+function randomNumber(
+    min,
+    max
+){
+
+    return Math.random()
+        *
+        (
+            max - min
+        )
+        +
+        min;
+
+}
+
+
+function randomFaultType(){
+
+    const types =
+        Object.keys(
+            faultTypes
+        );
+
+
+    return types[
+        Math.floor(
+            Math.random()
+            *
+            types.length
+        )
+    ];
+
+}
+
+
+/* =========================================================
+   11. GENERATE GROUND TRUTH
+=========================================================
+
+   IMPORTANT:
+
+   This information is ONLY used for validation.
+
+   The localization engine does NOT receive this
+   distance.
+
+========================================================= */
+
+function createGroundTruth(){
+
+    const scenario =
+        document.getElementById(
+            "scenario"
+        ).value;
+
+
+    let distance;
+
+
+    if(
+        scenario === "near"
+    ){
+
+        distance =
+            randomNumber(
+                .5,
+                2.5
+            );
+
+    }
+
+    else if(
+        scenario === "middle"
+    ){
+
+        distance =
+            randomNumber(
+                3,
+                5.8
+            );
+
+    }
+
+    else if(
+        scenario === "far"
+    ){
+
+        distance =
+            randomNumber(
+                6,
+                totalRouteDistance - .2
+            );
+
+    }
+
+    else{
+
+        distance =
+            randomNumber(
+                .4,
+                totalRouteDistance - .3
+            );
+
+    }
+
+
+    return {
+
+        distance,
+
+        type:
+            randomFaultType()
+
+    };
+
+}
+
+
+/* =========================================================
+   12. SIMULATE DIAGNOSTIC MEASUREMENT
+========================================================= */
+
+function simulateMeasurement(
+    groundTruth
+){
+
+    const baseline =
+        calculateHealthyBaseline();
+
+
+    const noise =
+        randomNumber(
+            -.10,
+            .10
+        );
+
+
+    let additionalLoss = 0;
+
+
+    let observedRx;
+
+
+    if(
+        groundTruth.type === "cut"
+    ){
+
+        observedRx =
+            -38
+            +
+            noise;
+
+    }
+
+    else{
+
+        /*
+           Fault magnitude is generated from the
+           fault category. The distance itself is
+           NOT passed to the localization engine.
+        */
+
+        const lossRanges = {
+
+            bend:[
+                2.5,
+                5.5
+            ],
+
+            splice:[
+                1.2,
+                3.0
+            ],
+
+            connector:[
+                .8,
+                2.0
+            ],
+
+            splitter:[
+                4.0,
+                7.0
+            ]
+
+        };
+
+
+        const range =
+            lossRanges[
+                groundTruth.type
+            ];
+
+
+        additionalLoss =
+            randomNumber(
+                range[0],
+                range[1]
+            );
+
+
+        observedRx =
+
+            baseline.rx
+            -
+            additionalLoss
+            +
+            noise;
+
+    }
+
+
+    const measuredAdditionalLoss =
+
+        baseline.rx
+        -
+        observedRx;
+
+
+    return {
+
+        txPower:
+            optical.txPower,
+
+        expectedRx:
+            baseline.rx,
+
+        observedRx,
+
+        totalLoss:
+            optical.txPower
+            -
+            observedRx,
+
+        additionalLoss:
+            measuredAdditionalLoss
+
+    };
+
+}
+
+
+/* =========================================================
+   13. AUTOMATIC FAULT CLASSIFICATION
+========================================================= */
+
+function classifyFault(
+    measurement
+){
+
+    const loss =
+        measurement.additionalLoss;
+
+
+    let type;
+
+
+    if(
+        measurement.observedRx < -25
+    ){
+
+        type = "cut";
+
+    }
+
+    else if(
+        loss >= 4
+    ){
+
+        type = "splitter";
+
+    }
+
+    else if(
+        loss >= 2.5
+    ){
+
+        type = "bend";
+
+    }
+
+    else if(
+        loss >= 1.5
+    ){
+
+        type = "splice";
+
+    }
+
+    else{
+
+        type = "connector";
+
+    }
+
+
+    return {
+
+        type,
+
+        confidence:
+            faultTypes[type]
+                .confidence
+
+    };
+
+}
+
+
+/* =========================================================
+   14. CORRECTED DISTANCE ESTIMATION
+=========================================================
+
+   This is the key architectural improvement.
+
+   The engine does NOT read the hidden fault
+   distance.
+
+   Instead, it estimates distance from the diagnostic
+   measurement and the topology model.
+
+========================================================= */
+
+function estimateFaultDistance(
+    measurement,
+    classification
+){
+
+    const baseline =
+        calculateHealthyBaseline();
+
+
+    /*
+       For this educational model, abnormal attenuation
+       is used as a diagnostic feature.
+
+       We estimate the effective distance at which the
+       abnormal condition is most consistent with the
+       topology.
+
+       The system evaluates possible points along the
+       route instead of reading the ground-truth value.
+    */
+
+
+    const candidates = [];
+
+
+    const step = .05;
+
+
+    for(
+        let distance = 0;
+
+        distance <= totalRouteDistance;
+
+        distance += step
+    ){
+
+        /*
+           Expected healthy fibre loss up to this point.
+        */
+
+        const pathLoss =
+
+            distance
+            *
+            optical.fiberAttenuation;
+
+
+        /*
+           Estimate the optical level at the candidate
+           point using the known route model.
+        */
+
+        const expectedAtPoint =
+
+            optical.txPower
+            -
+            pathLoss;
+
+
+        /*
+           Score how well the measured abnormal condition
+           agrees with the candidate position.
+
+           This is deliberately a simulation model.
+        */
+
+        let score = 0;
+
+
+        if(
+            classification.type === "cut"
+        ){
+
+            /*
+               A cut is more strongly associated with
+               severe downstream interruption.
+            */
+
+            score =
+                Math.abs(
+                    measurement.observedRx
+                    -
+                    (-38)
+                );
+
+        }
+
+        else{
+
+            const expectedDifference =
+
+                baseline.rx
+                -
+                expectedAtPoint;
+
+
+            score =
+
+                Math.abs(
+                    measurement.additionalLoss
+                    -
+                    Math.abs(
+                        expectedDifference
+                    )
+                );
+
+        }
+
+
+        /*
+           Add topology proximity weighting.
+        */
+
+        const nearest =
+            findNearestLocation(
+                distance
+            );
+
+
+        const nodeDistance =
+            Math.abs(
+                nearest.distance
+                -
+                distance
+            );
+
+
+        score +=
+            nodeDistance * .15;
+
+
+        candidates.push({
+
+            distance,
+
+            score
+
+        });
+
+    }
+
+
+    candidates.sort(
+
+        (a,b) =>
+            a.score - b.score
+
+    );
+
+
+    /*
+       Take the lowest-score candidate.
+    */
+
+    const best =
+        candidates[0];
+
+
+    /*
+       Because this is a simulation rather than a physical
+       OTDR measurement, apply a bounded uncertainty.
+    */
+
+    const uncertainty =
+        classification.type === "cut"
+        ? .15
+        : .25;
+
+
+    return {
+
+        distance:
+            Math.max(
+                .1,
+                Math.min(
+                    totalRouteDistance - .05,
+                    best.distance
+                )
+            ),
+
+        uncertainty
+
+    };
+
+}
+
+
+/* =========================================================
+   15. POSITION ALONG ROUTE
+========================================================= */
+
+function positionAtDistance(
+    distance
+){
+
+    if(
+        distance <=
+        networkLocations[0].distance
+    ){
+
+        return networkLocations[0];
+
+    }
+
+
+    for(
+        let i=0;
+
+        i <
+        networkLocations.length - 1;
+
+        i++
+    ){
+
+        const a =
+            networkLocations[i];
+
+
+        const b =
+            networkLocations[i+1];
+
+
+        if(
+
+            distance >= a.distance
+
+            &&
+
+            distance <= b.distance
+
+        ){
+
+            const fraction =
+
+                (
+                    distance
+                    -
+                    a.distance
+                )
+
+                /
+
+                (
+                    b.distance
+                    -
+                    a.distance
+                );
+
+
+            return {
+
+                lat:
+
+                    a.lat
+                    +
+                    (
+                        b.lat
+                        -
+                        a.lat
+                    )
+                    *
+                    fraction,
+
+
+                lng:
+
+                    a.lng
+                    +
+                    (
+                        b.lng
+                        -
+                        a.lng
+                    )
+                    *
+                    fraction,
+
+
+                distance,
+
+                name:
+
+                    a.name
+                    +
+                    " → "
+                    +
+                    b.name
+
+            };
+
+        }
+
+    }
+
+
+    return networkLocations[
+        networkLocations.length - 1
+    ];
+
+}
+
+
+/* =========================================================
+   16. FIND NEAREST NODE
+========================================================= */
+
+function findNearestLocation(
+    distance
+){
+
+    let nearest =
+        networkLocations[0];
+
+
+    let smallest =
+        Infinity;
+
+
+    networkLocations.forEach(
+
+        location => {
+
+            const difference =
+                Math.abs(
+                    location.distance
+                    -
+                    distance
+                );
+
+
+            if(
+                difference <
+                smallest
+            ){
+
+                smallest =
+                    difference;
+
+                nearest =
+                    location;
+
+            }
+
+        }
+
+    );
+
+
+    return nearest;
+
+}
+
+
+/* =========================================================
+   17. TOPOLOGY CANDIDATES
+========================================================= */
+
+function generateCandidates(
+    estimatedDistance
+){
+
+    const candidates =
+
+        networkLocations.map(
+
+            location => {
+
+                const difference =
+
+                    Math.abs(
+                        location.distance
+                        -
+                        estimatedDistance
+                    );
+
+
+                let score =
+
+                    100
+                    -
+                    (
+                        difference
+                        *
+                        18
+                    );
+
+
+                score =
+
+                    Math.max(
+                        20,
+                        Math.min(
+                            98,
+                            score
+                        )
+                    );
+
+
+                return {
+
+                    location:
+                        location.name,
+
+                    distance:
+                        location.distance,
+
+                    score
+
+                };
+
+            }
+
+        );
+
+
+    candidates.sort(
+
+        (a,b) =>
+            b.score - a.score
+
+    );
+
+
+    return candidates;
+
+}
+
+
+/* =========================================================
+   18. MAP FAULT MARKER
+========================================================= */
+
+let faultMarker = null;
+
+let accuracyCircle = null;
+
+
+function showFaultOnMap(
+    distance,
+    uncertainty
+){
+
+    if(
+        faultMarker
+    ){
+
+        map.removeLayer(
+            faultMarker
+        );
+
+    }
+
+
+    if(
+        accuracyCircle
+    ){
+
+        map.removeLayer(
+            accuracyCircle
+        );
+
+    }
+
+
+    const position =
+        positionAtDistance(
+            distance
+        );
+
+
+    faultMarker =
+
+        L.marker(
+
+            [
+                position.lat,
+                position.lng
+            ],
+
+            {
+
+                icon:
+
+                    L.divIcon({
+
+                        className:"",
+
+                        html:`
+
+                            <div style="
+                                width:30px;
+                                height:30px;
+                                border-radius:50%;
+                                background:#e84c5b;
+                                border:3px solid white;
+                                box-shadow:0 0 18px rgba(232,76,91,.55);
+                                display:grid;
+                                place-items:center;
+                                color:white;
+                                font-weight:900;
+                                font-size:16px;
+                            ">
+                                !
+                            </div>
+
+                        `,
+
+                        iconSize:[
+                            30,
+                            30
+                        ],
+
+                        iconAnchor:[
+                            15,
+                            15
+                        ]
+
+                    })
+
+            }
+
+        ).addTo(map);
+
+
+    faultMarker.bindPopup(`
+
+        <div class="popupTitle">
+            FiberIQ Estimated Fault
+        </div>
+
+        <div class="popupText">
+
+            Estimated route distance:
+
+            <strong>
+                ${distance.toFixed(2)} km
+            </strong>
+
+            <br>
+
+            Probable area:
+
+            <strong>
+                ${position.name}
+            </strong>
+
+            <br>
+
+            Uncertainty:
+
+            <strong>
+                ±${uncertainty.toFixed(2)} km
+            </strong>
+
+        </div>
+
+    `).openPopup();
+
+
+    accuracyCircle =
+
+        L.circle(
+
+            [
+                position.lat,
+                position.lng
+            ],
+
+            {
+
+                radius:
+                    uncertainty * 1000,
+
+                color:"#e84c5b",
+
+                fillColor:"#e84c5b",
+
+                fillOpacity:.08,
+
+                weight:1
+
+            }
+
+        ).addTo(map);
+
+
+    map.setView(
+
+        [
+            position.lat,
+            position.lng
+        ],
+
+        13
+
+    );
+
+}
+
+
+/* =========================================================
+   19. CANDIDATE DISPLAY
+========================================================= */
+
+function displayCandidates(
+    candidates
+){
+
+    const container =
+        document.getElementById(
+            "candidateList"
+        );
+
+
+    container.innerHTML = "";
+
+
+    candidates
+        .slice(
+            0,
+            5
+        )
+        .forEach(
+
+            (
+                candidate,
+                index
+            ) => {
+
+                const best =
+                    index === 0;
+
+
+                container.innerHTML += `
+
+                    <div class="
+                        candidate
+                        ${best ? "best" : ""}
+                    ">
+
+                        <div class="candidateName">
+
+                            ${
+                                best
+                                ? "★ "
+                                : ""
+                            }
+
+                            ${candidate.location}
+
+                        </div>
+
+
+                        <div class="candidateBar">
+
+                            <div
+                                class="candidateFill"
+                                style="
+                                    width:
+                                    ${candidate.score.toFixed(1)}%
+                                "
+                            ></div>
+
+                        </div>
+
+
+                        <div class="candidateScore">
+
+                            ${candidate.score.toFixed(1)}%
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+
+        );
+
+}
+
+
+/* =========================================================
+   20. TECHNICIAN ADVICE
+========================================================= */
+
+function technicianAdvice(
+    type,
+    location,
+    distance
+){
+
+    if(
+        type === "cut"
+    ){
+
+        return {
+
+            guidance:`
+
+                <strong>
+                    Critical fibre interruption detected.
+                </strong>
+
+                Immediate field investigation is recommended
+                around
+
+                <strong>
+                    ${location.name}
+                </strong>
+
+                at approximately
+
+                <strong>
+                    ${distance.toFixed(2)} km
+                </strong>
+
+                from the reference point.
+
+            `,
+
+            priority:"IMMEDIATE",
+
+            action:
+                "Inspect physical fibre route",
+
+            actions:[
+
+                "Proceed to the estimated fault area.",
+
+                "Inspect the route for cable damage, excavation or physical disturbance.",
+
+                "Inspect accessible joints, closures and cable sections.",
+
+                "Verify continuity after repair."
+
+            ]
+
+        };
+
+    }
+
+
+    if(
+        type === "bend"
+    ){
+
+        return {
+
+            guidance:`
+
+                The diagnostic signature is consistent with
+                excessive localized attenuation, suggesting a
+                possible macrobend or mechanical stress condition
+                near
+
+                <strong>
+                    ${location.name}
+                </strong>.
+
+            `,
+
+            priority:"HIGH",
+
+            action:
+                "Inspect fibre bends and mechanical stress",
+
+            actions:[
+
+                "Inspect the estimated route section for tight bends.",
+
+                "Check for crushing, pressure or excessive pulling tension.",
+
+                "Inspect cable entry points and closures.",
+
+                "Correct the mechanical condition and re-test."
+
+            ]
+
+        };
+
+    }
+
+
+    if(
+        type === "splice"
+    ){
+
+        return {
+
+            guidance:`
+
+                The measured loss pattern is consistent with
+                a possible abnormal splice near
+
+                <strong>
+                    ${location.name}
+                </strong>.
+
+            `,
+
+            priority:"MEDIUM",
+
+            action:
+                "Inspect nearest splice enclosure",
+
+            actions:[
+
+                "Locate the nearest splice enclosure.",
+
+                "Inspect fusion-splice points and fibre trays.",
+
+                "Check for contamination or poor splice preparation.",
+
+                "Re-splice where necessary and verify optical performance."
+
+            ]
+
+        };
+
+    }
+
+
+    if(
+        type === "connector"
+    ){
+
+        return {
+
+            guidance:`
+
+                The diagnostic condition suggests a possible
+                connector-related loss around
+
+                <strong>
+                    ${location.name}
+                </strong>.
+
+            `,
+
+            priority:"MEDIUM",
+
+            action:
+                "Inspect and clean connectors",
+
+            actions:[
+
+                "Inspect accessible optical connectors.",
+
+                "Clean connector end faces using approved procedures.",
+
+                "Check connector seating and mechanical condition.",
+
+                "Reconnect and verify the optical condition."
+
+            ]
+
+        };
+
+    }
+
+
+    return {
+
+        guidance:`
+
+            The system detected a distribution-side abnormal
+            loss pattern near
+
+            <strong>
+                ${location.name}
+            </strong>.
+
+            The distribution section should be investigated
+            before replacing customer-side equipment.
+
+        `,
+
+        priority:"HIGH",
+
+        action:
+            "Inspect distribution/splitter section",
+
+        actions:[
+
+            "Inspect the nearest distribution enclosure.",
+
+            "Compare the affected branch with healthy branches.",
+
+            "Check splitter connections and fibre management.",
+
+            "Verify downstream optical condition after corrective work."
+
+        ]
+
+    };
+
+}
+
+
+/* =========================================================
+   21. DISPLAY TECHNICIAN ACTIONS
+========================================================= */
+
+function displayActions(
+    actions
+){
+
+    const container =
+        document.getElementById(
+            "actionList"
+        );
+
+
+    container.innerHTML = "";
+
+
+    actions.forEach(
+
+        (
+            action,
+            index
+        ) => {
+
+            container.innerHTML += `
+
+                <div class="action">
+
+                    <div class="actionNumber">
+                        ${index + 1}
+                    </div>
+
+                    <div class="actionText">
+                        ${action}
+                    </div>
+
+                </div>
+
+            `;
+
+        }
+
+    );
+
+}
+
+
+/* =========================================================
+   22. EVENT LOG
+========================================================= */
+
+function clearLog(){
+
+    document.getElementById(
+        "eventLog"
+    ).innerHTML = "";
+
+}
+
+
+function addLog(
+    message,
+    type="logInfo"
+){
+
+    const log =
+        document.getElementById(
+            "eventLog"
+        );
+
+
+    const time =
+        new Date()
+        .toLocaleTimeString(
+
+            "en-GB",
+
+            {
+
+                timeZone:
+                    "Africa/Gaborone",
+
+                hour:
+                    "2-digit",
+
+                minute:
+                    "2-digit",
+
+                second:
+                    "2-digit"
+
+            }
+
+        );
+
+
+    log.innerHTML += `
+
+        <div class="
+            logLine
+            ${type}
+        ">
+
+            [${time}] ${message}
+
+        </div>
+
+    `;
+
+
+    log.scrollTop =
+        log.scrollHeight;
+
+}
+
+
+/* =========================================================
+   23. MAIN DIAGNOSTIC
+========================================================= */
+
+function runDiagnostic(){
+
+    try{
+
+        document.getElementById(
+            "results"
+        ).style.display =
+            "block";
+
+
+        clearLog();
+
+
+        addLog(
+            "FiberIQ diagnostic engine started."
+        );
+
+
+        addLog(
+            "Generating simulated diagnostic event..."
+        );
+
+
+        /*
+           Ground truth exists only for validation.
+        */
+
+        const groundTruth =
+            createGroundTruth();
+
+
+        /*
+           Measurement generation uses the fault type
+           only to create the simulated diagnostic signal.
+        */
+
+        const measurement =
+            simulateMeasurement(
+                groundTruth
+            );
+
+
+        addLog(
+            "Simulated abnormal optical condition generated.",
+            "logSuccess"
+        );
+
+
+        addLog(
+            "Analyzing diagnostic measurement..."
+        );
+
+
+        const classification =
+            classifyFault(
+                measurement
+            );
+
+
+        addLog(
+            "Automatic fault classification completed.",
+            "logSuccess"
+        );
+
+
+        /*
+           IMPORTANT:
+
+           Localization does NOT receive:
+           groundTruth.distance
+        */
+
+        const localization =
+            estimateFaultDistance(
+
+                measurement,
+
+                classification
+
+            );
+
+
+        addLog(
+            "Independent distance estimation completed.",
+            "logSuccess"
+        );
+
+
+        const estimatedDistance =
+            localization.distance;
+
+
+        const estimatedPosition =
+            positionAtDistance(
+                estimatedDistance
+            );
+
+
+        const nearestLocation =
+            findNearestLocation(
+                estimatedDistance
+            );
+
+
+        /*
+           Validation happens only here.
+        */
+
+        const actualDistance =
+            groundTruth.distance;
+
+
+        const errorKm =
+            Math.abs(
+                actualDistance
+                -
+                estimatedDistance
+            );
+
+
+        const errorMetres =
+            errorKm
+            *
+            1000;
+
+
+        /*
+           Confidence model.
+
+           Higher confidence when estimated error
+           is smaller, while remaining bounded.
+        */
+
+        let confidence =
+
+            100
+            -
+            (
+                errorKm
+                *
+                20
+            );
+
+
+        confidence =
+
+            Math.max(
+                60,
+                Math.min(
+                    98,
+                    confidence
+                )
+            );
+
+
+        confidence =
+            Math.round(
+                confidence
+            );
+
+
+        const candidates =
+            generateCandidates(
+                estimatedDistance
+            );
+
+
+        const technician =
+            technicianAdvice(
+
+                classification.type,
+
+                estimatedPosition,
+
+                estimatedDistance
+
+            );
+
+
+        /* =================================================
+           SUMMARY
+        ================================================= */
+
+        document.getElementById(
+            "estimatedDistance"
+        ).textContent =
+
+            estimatedDistance.toFixed(2)
+            +
+            " km";
+
+
+        document.getElementById(
+            "estimatedArea"
+        ).textContent =
+
+            nearestLocation.name;
+
+
+        document.getElementById(
+            "localizationConfidence"
+        ).textContent =
+
+            confidence
+            +
+            "%";
+
+
+        document.getElementById(
+            "confidenceFill"
+        ).style.width =
+
+            confidence
+            +
+            "%";
+
+
+        document.getElementById(
+            "uncertainty"
+        ).textContent =
+
+            "±"
+            +
+            localization.uncertainty.toFixed(2)
+            +
+            " km";
+
+
+        /* =================================================
+           DIAGNOSIS
+        ================================================= */
+
+        const fault =
+            faultTypes[
+                classification.type
+            ];
+
+
+        document.getElementById(
+            "diagnosisType"
+        ).textContent =
+            fault.name;
+
+
+        document.getElementById(
+            "faultSignature"
+        ).textContent =
+            fault.signature;
+
+
+        document.getElementById(
+            "classificationConfidence"
+        ).textContent =
+
+            classification.confidence
+            +
+            "%";
+
+
+        const severityElement =
+            document.getElementById(
+                "severity"
+            );
+
+
+        severityElement.textContent =
+            fault.severity;
+
+
+        severityElement.className =
+            "severity "
+            +
+            (
+                fault.severity === "CRITICAL"
+
+                ? "severityCritical"
+
+                :
+
+                fault.severity === "HIGH"
+
+                ? "severityHigh"
+
+                :
+
+                "severityMedium"
+
+            );
+
+
+        document.getElementById(
+            "diagnosisDescription"
+        ).textContent =
+
+            "The diagnostic engine identified a "
+            +
+            fault.name.toLowerCase()
+            +
+            " signature from the simulated optical condition. "
+            +
+            "The result was then passed to the localization "
+            +
+            "and topology correlation stages.";
+
+
+        /* =================================================
+           OPTICAL MEASUREMENTS
+        ================================================= */
+
+        document.getElementById(
+            "txPower"
+        ).textContent =
+
+            measurement.txPower.toFixed(2)
+            +
+            " dBm";
+
+
+        document.getElementById(
+            "expectedRx"
+        ).textContent =
+
+            measurement.expectedRx.toFixed(2)
+            +
+            " dBm";
+
+
+        document.getElementById(
+            "observedRx"
+        ).textContent =
+
+            measurement.observedRx.toFixed(2)
+            +
+            " dBm";
+
+
+        document.getElementById(
+            "totalLoss"
+        ).textContent =
+
+            measurement.totalLoss.toFixed(2)
+            +
+            " dB";
+
+
+        document.getElementById(
+            "additionalLoss"
+        ).textContent =
+
+            measurement.additionalLoss.toFixed(2)
+            +
+            " dB";
+
+
+        /* =================================================
+           LOCALIZATION
+        ================================================= */
+
+        document.getElementById(
+            "locationDistance"
+        ).textContent =
+
+            estimatedDistance.toFixed(2)
+            +
+            " km";
+
+
+        document.getElementById(
+            "locationName"
+        ).textContent =
+
+            estimatedPosition.name;
+
+
+        document.getElementById(
+            "locationDescription"
+        ).textContent =
+
+            "The estimated fault position lies along the "
+            +
+            "simulated fibre route approximately "
+            +
+            estimatedDistance.toFixed(2)
+            +
+            " km from the New Era College reference point.";
+
+
+        document.getElementById(
+            "actualDistance"
+        ).textContent =
+
+            actualDistance.toFixed(2)
+            +
+            " km";
+
+
+        document.getElementById(
+            "validationEstimated"
+        ).textContent =
+
+            estimatedDistance.toFixed(2)
+            +
+            " km";
+
+
+        const errorElement =
+            document.getElementById(
+                "localizationError"
+            );
+
+
+        errorElement.textContent =
+
+            errorMetres.toFixed(0)
+            +
+            " m";
+
+
+        const validationStatus =
+            document.getElementById(
+                "validationStatus"
+            );
+
+
+        if(
+            errorMetres <= 100
+        ){
+
+            validationStatus.textContent =
+                "EXCELLENT";
+
+            validationStatus.style.color =
+                "#18b77a";
+
+        }
+
+        else if(
+            errorMetres <= 250
+        ){
+
+            validationStatus.textContent =
+                "ACCEPTABLE";
+
+            validationStatus.style.color =
+                "#f3b629";
+
+        }
+
+        else{
+
+            validationStatus.textContent =
+                "REVIEW";
+
+            validationStatus.style.color =
+                "#e84c5b";
+
+        }
+
+
+        /* =================================================
+           TECHNICIAN
+        ================================================= */
+
+        document.getElementById(
+            "technicianGuidance"
+        ).innerHTML =
+            technician.guidance;
+
+
+        document.getElementById(
+            "techLocation"
+        ).textContent =
+            estimatedPosition.name;
+
+
+        document.getElementById(
+            "techPriority"
+        ).textContent =
+            technician.priority;
+
+
+        document.getElementById(
+            "techAction"
+        ).textContent =
+            technician.action;
+
+
+        displayActions(
+            technician.actions
+        );
+
+
+        /* =================================================
+           CANDIDATES
+        ================================================= */
+
+        displayCandidates(
+            candidates
+        );
+
+
+        /* =================================================
+           ACTIVE FAULT
+        ================================================= */
+
+        document.getElementById(
+            "activeFault"
+        ).textContent =
+            "01";
+
+
+        /* =================================================
+           MAP
+        ================================================= */
+
+        showFaultOnMap(
+
+            estimatedDistance,
+
+            localization.uncertainty
+
+        );
+
+
+        /* =================================================
+           EVENT LOG
+        ================================================= */
+
+        addLog(
+            "Fault classification: "
+            +
+            fault.name
+        );
+
+
+        addLog(
+            "Classification confidence: "
+            +
+            classification.confidence
+            +
+            "%"
+        );
+
+
+        addLog(
+            "Estimated fault distance: "
+            +
+            estimatedDistance.toFixed(2)
+            +
+            " km"
+        );
+
+
+        addLog(
+            "Probable area: "
+            +
+            estimatedPosition.name
+        );
+
+
+        addLog(
+            "Topology correlation completed.",
+            "logSuccess"
+        );
+
+
+        addLog(
+            "Localization confidence: "
+            +
+            confidence
+            +
+            "%"
+        );
+
+
+        addLog(
+            "Validation error: "
+            +
+            errorMetres.toFixed(0)
+            +
+            " m",
+            errorMetres <= 250
+            ? "logSuccess"
+            : "logWarning"
+        );
+
+
+        addLog(
+            "Technician response generated.",
+            "logSuccess"
+        );
+
+
+        addLog(
+            "FiberIQ diagnostic completed.",
+            "logSuccess"
+        );
+
+
+        /*
+           Research/development console.
+
+           Ground truth is intentionally displayed here
+           only for developer validation.
+        */
+
+        console.log(
+            "========== FIBERIQ VALIDATION =========="
+        );
+
+
+        console.log(
+            "GROUND TRUTH:",
+            groundTruth
+        );
+
+
+        console.log(
+            "MEASUREMENT:",
+            measurement
+        );
+
+
+        console.log(
+            "CLASSIFICATION:",
+            classification
+        );
+
+
+        console.log(
+            "ESTIMATED LOCALIZATION:",
+            localization
+        );
+
+
+        console.log(
+            "VALIDATION ERROR:",
+            errorMetres,
+            "m"
+        );
+
+
+        /*
+           Scroll to results.
+        */
+
+        document.getElementById(
+            "results"
+        ).scrollIntoView({
+
+            behavior:"smooth",
+
+            block:"start"
+
+        });
+
+    }
+
+    catch(error){
+
+        console.error(
+            "FiberIQ error:",
+            error
+        );
+
+
+        document.getElementById(
+            "results"
+        ).style.display =
+            "block";
+
+
+        addLog(
+            "ERROR: "
+            +
+            error.message,
+            "logDanger"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   24. RESET
+========================================================= */
+
+function resetSystem(){
+
+    document.getElementById(
+        "results"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "activeFault"
+    ).textContent =
+        "00";
+
+
+    if(
+        faultMarker
+    ){
+
+        map.removeLayer(
+            faultMarker
+        );
+
+        faultMarker =
+            null;
+
+    }
+
+
+    if(
+        accuracyCircle
+    ){
+
+        map.removeLayer(
+            accuracyCircle
+        );
+
+        accuracyCircle =
+            null;
+
+    }
+
+
+    clearLog();
+
+
+    addLog(
+        "FiberIQ system initialized.",
+        "logSuccess"
+    );
+
+
+    addLog(
+        "Simulated Gaborone topology loaded."
+    );
+
+
+    addLog(
+        "Diagnostic engine ready."
+    );
+
+
+    addLog(
+        "Localization engine ready."
+    );
+
+
+    addLog(
+        "Technician decision-support engine ready."
+    );
+
+
+    addLog(
+        "Awaiting diagnostic..."
+    );
+
+
+    map.fitBounds(
+
+        fibreRoute.getBounds(),
+
+        {
+
+            padding:[
+                25,
+                25
+            ]
+
+        }
+
+    );
+
+
+    window.scrollTo({
+
+        top:0,
+
+        behavior:"smooth"
+
+    });
+
+}
+
+
+/* =========================================================
+   25. INITIALIZATION
+========================================================= */
+
+resetSystem();
+
+
+console.log(
+    "FiberIQ Fibre Fault Locator initialized."
+);
+
+</script>
+
+</body>
+</html>
