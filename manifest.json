@@ -3,8 +3,11 @@
   "short_name": "FiberIQ",
   "description": "Fibre fault diagnosis and localization system for network operations and field technician support.",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#f4f8fb",
   "theme_color": "#0b5ed7",
-  "orientation": "portrait"
+  "orientation": "portrait",
+  "lang": "en",
+  "dir": "ltr"
 }
