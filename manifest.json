@@ -54,16 +54,22 @@
 
 "screenshots": [
   {
-    "src": "/FiberIQ/screenshots/dashboard.png",
+    "src": "/FiberIQ/screenshots/dashboard.PNG",
+    "type": "image/png",
+    "form_factor": "narrow",
+    "label": "FiberIQ Mobile Dashboard"
+  },
+  {
+    "src": "/FiberIQ/screenshots/fault-locator.PNG",
+    "type": "image/png",
+    "form_factor": "narrow",
+    "label": "FiberIQ Mobile Fault Localization"
+  },
+  {
+    "src": "/FiberIQ/screenshots/dashboard-wide.PNG",
     "type": "image/png",
     "form_factor": "wide",
     "label": "FiberIQ Network Operations Dashboard"
-  },
-  {
-    "src": "/FiberIQ/screenshots/fault-locator.png",
-    "type": "image/png",
-    "form_factor": "wide",
-    "label": "FiberIQ Fibre Fault Localization"
   }
 ]
 }
