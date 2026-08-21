@@ -1,16 +1,71 @@
-"screenshots": [
-  {
-    "src": "/FiberIQ/screenshots/dashboard.png",
-    "sizes": "1292x356",
-    "type": "image/png",
-    "form_factor": "wide",
-    "label": "FiberIQ Network Operations Dashboard"
-  },
-  {
-    "src": "/FiberIQ/screenshots/fault-locator.png",
-    "sizes": "1263x506",
-    "type": "image/png",
-    "form_factor": "wide",
-    "label": "FiberIQ Fibre Fault Localization"
-  }
-]
+{
+  "id": "/FiberIQ/",
+  "name": "FiberIQ Fibre Fault Locator",
+  "short_name": "FiberIQ",
+  "description": "Fibre fault diagnosis and localization system for network operations and field technician support.",
+  "start_url": "/FiberIQ/",
+  "scope": "/FiberIQ/",
+  "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone"
+  ],
+  "background_color": "#f4f8fb",
+  "theme_color": "#0b5ed7",
+  "orientation": "portrait",
+  "lang": "en",
+  "dir": "ltr",
+
+  "categories": [
+    "business",
+    "utilities",
+    "productivity"
+  ],
+
+  "icons": [
+    {
+      "src": "/FiberIQ/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/FiberIQ/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+
+  "shortcuts": [
+    {
+      "name": "Fault Locator",
+      "short_name": "Locate Fault",
+      "description": "Open the fibre fault localization interface.",
+      "url": "/FiberIQ/#locator"
+    },
+    {
+      "name": "NOC Dashboard",
+      "short_name": "Dashboard",
+      "description": "Open the network operations dashboard.",
+      "url": "/FiberIQ/#dashboard"
+    }
+  ],
+
+  "screenshots": [
+    {
+      "src": "/FiberIQ/screenshots/dashboard.png",
+      "sizes": "1292x356",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "FiberIQ Network Operations Dashboard"
+    },
+    {
+      "src": "/FiberIQ/screenshots/fault-locator.png",
+      "sizes": "1263x506",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "FiberIQ Fibre Fault Localization"
+    }
+  ]
+}
