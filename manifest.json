@@ -52,7 +52,7 @@
     }
   ],
 
-  "screenshots": [
+ "screenshots": [
   {
     "src": "/FiberIQ/screenshots/dashboard.PNG",
     "sizes": "1292x356",
@@ -76,7 +76,7 @@
   },
   {
     "src": "/FiberIQ/screenshots/fault-locator-mobile.png",
-    "sizes": "390x844",
+    "sizes": "720x1355",
     "type": "image/png",
     "form_factor": "narrow",
     "label": "FiberIQ Mobile Fibre Fault Localization"
